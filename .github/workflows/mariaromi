@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+
+const actors = [
+  { name: "Leonardo DiCaprio", image: "/images/leonardo.jpg", country: "USA" },
+  { name: "Scarlett Johansson", image: "/images/scarlett.jpg", country: "USA" },
+  { name: "Tom Cruise", image: "/images/tom.jpg", country: "USA" },
+  { name: "Meryl Streep", image: "/images/meryl.jpg", country: "USA" },
+  { name: "Brad Pitt", image: "/images/brad.jpg", country: "USA" },
+  { name: "Angelina Jolie", image: "/images/angelina.jpg", country: "USA" },
+  { name: "Johnny Depp", image: "/images/johnny.jpg", country: "USA" },
+  { name: "Robert Downey Jr.", image: "/images/robert.jpg", country: "USA" },
+  { name: "Jennifer Lawrence", image: "/images/jennifer.jpg", country: "USA" },
+  { name: "Denzel Washington", image: "/images/denzel.jpg", country: "USA" },
+  { name: "Marion Cotillard", image: "/images/marion.jpg", country: "France" },
+  { name: "Jean Dujardin", image: "/images/jean.jpg", country: "France" },
+  { name: "Penélope Cruz", image: "/images/penelope.jpg", country: "Spain" },
+  { name: "Javier Bardem", image: "/images/javier.jpg", country: "Spain" },
+  { name: "Gael García Bernal", image: "/images/gael.jpg", country: "Mexico" },
+  { name: "Salma Hayek", image: "/images/salma.jpg", country: "Mexico" },
+  { name: "Ricardo Darín", image: "/images/ricardo.jpg", country: "Argentina" },
+  { name: "Sofía Vergara", image: "/images/sofia.jpg", country: "Colombia" }
+];
+
+export default function ActorGuessGame() {
+  const [currentActor, setCurrentActor] = useState(null);
+  const [options, setOptions] = useState([]);
+  const [message, setMessage] = useState("");
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    pickRandomActor();
+  }, []);
+
+  const pickRandomActor = () => {
+    const randomActor = actors[Math.floor(Math.random() * actors.length)];
+    let otherOptions = actors.filter(a => a.name !== randomActor.name);
+    otherOptions = otherOptions.sort(() => 0.5 - Math.random()).slice(0, 2);
+    
+    const shuffledOptions = [...otherOptions, randomActor].sort(() => 0.5 - Math.random());
+    
+    setCurrentActor(randomActor);
+    setOptions(shuffledOptions);
+    setMessage("");
+  };
+
+  const checkGuess = (guess) => {
+    if (guess === currentActor.name) {
+      setMessage("¡Correcto! 🎉");
+      setScore(score + 1);
+    } else {
+      setMessage("Incorrecto. Intenta de nuevo.");
+    }
+    setTimeout(pickRandomActor, 1000);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-5">
+      <Card className="w-96 text-center">
+        <CardContent className="p-5">
+          <h1 className="text-xl font-bold mb-4">Adivina el Actor o Actriz</h1>
+          {currentActor && (
+            <>
+              <img src={currentActor.image} alt={currentActor.name} className="mb-4 w-full rounded-xl" />
+              <div className="flex flex-col gap-2">
+                {options.map(option => (
+                  <Button key={option.name} onClick={() => checkGuess(option.name)}>
+                    {option.name}
+                  </Button>
+                ))}
+              </div>
+            </>
+          )}
+          <motion.p
+            className="mt-4 text-lg font-semibold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            key={message}
+          >
+            {message}
+          </motion.p>
+          <p className="mt-4 text-lg">Puntuación: {score}</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
